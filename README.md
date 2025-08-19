@@ -395,7 +395,7 @@ ip,description
 10.0.0.0/16
 ```
 
-### 📤 Sample Output
+### 📤 Sample Cisco ASA Output
 
 ```
 ! Generated with 25% missing threshold
@@ -468,7 +468,7 @@ This project is open source and available under the MIT License.
 
 ## 🤝 Contributing
 
-Feel free to submit issues, feature requests, or pull requests to improve the tool.
+Please don't submit issues, feature requests, or pull requests to improve the tool.
 
 ---
 
@@ -482,10 +482,9 @@ Feel free to submit issues, feature requests, or pull requests to improve the to
 
 ---
 
-**Made with ❤️ for network administrators and security professionals**
+**Made as fast as possible for network administrators and security professionals**
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Network%20Security-Cisco%20ASA-007ACC?style=for-the-badge&logo=cisco&logoColor=white" alt="Cisco ASA">
   <img src="https://img.shields.io/badge/Python-Flask-FF6B6B?style=for-the-badge&logo=python&logoColor=white" alt="Python Flask">
   <img src="https://img.shields.io/badge/Web%20Development-Modern%20UI-28A745?style=for-the-badge&logo=web&logoColor=white" alt="Web Development">
 </div>
