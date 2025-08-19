@@ -9,7 +9,7 @@
 
 **A powerful tool for consolidating individual IP addresses from any file format into efficient CIDR networks, with special optimization for network configurations including Cisco ASA.**
 
-[🚀 Quick Start](#installation--setup-step-by-step-guide) • [📊 Features](#features) • [🌐 Web Interface](#web-interface) • [📖 Documentation](#documentation)
+[🚀 Quick Start](#installation--setup) • [📊 Features](#-features) • [🌐 Web Interface](#-web-interface) • [📖 Usage](#-usage-guide)
 
 </div>
 
@@ -37,8 +37,6 @@
 
 ## 🌐 Web Interface
 
-The project now includes a modern web interface built with Flask that provides:
-
 <div align="center">
 
 | 🎯 **Drag & Drop Upload** | ⚡ **Real-time Analysis** | 📊 **Interactive Charts** |
@@ -51,11 +49,9 @@ The project now includes a modern web interface built with Flask that provides:
 
 </div>
 
-## 🛠️ Installation & Setup (Step-by-Step Guide)
+## 🛠️ Installation & Setup
 
-### 📋 Prerequisites - What You Need First
-
-**You need these things installed on your computer:**
+### 📋 Prerequisites
 
 <div align="center">
 
@@ -69,10 +65,6 @@ The project now includes a modern web interface built with Flask that provides:
    - Go to [python.org](https://python.org)
    - Download the latest version for your operating system
    - **IMPORTANT**: During installation, check the box that says "Add Python to PATH"
-
-2. **A text editor** (like Notepad++, VS Code, or even regular Notepad)
-
-3. **A web browser** (Chrome, Firefox, Safari, or Edge)
 
 ### 📥 Step 1: Get the Application Files
 
@@ -127,8 +119,6 @@ The project now includes a modern web interface built with Flask that provides:
 
 ### 📦 Step 3: Install Python Dependencies
 
-**What this does:** This downloads all the extra software the application needs to work.
-
 <div align="center">
 
 | ⚡ **Primary Command** | 🔄 **Alternative Command** |
@@ -152,8 +142,6 @@ The project now includes a modern web interface built with Flask that provides:
    ```
 
 ### 🔒 Step 4: Set Up Security (Optional but Recommended)
-
-**What this does:** This makes your application more secure by setting up a secret password.
 
 <div align="center">
 
@@ -184,7 +172,7 @@ The project now includes a modern web interface built with Flask that provides:
    - Replace `your_secure_secret_key_here_64_characters_long` with the long string you copied in step 1
    - Save the file
 
-### Step 5: Run the Application
+### 🚀 Step 5: Run the Application
 
 1. **In your Command Prompt/Terminal**, make sure you're in the project folder, then type:
    ```bash
@@ -199,76 +187,36 @@ The project now includes a modern web interface built with Flask that provides:
 
 3. **Keep this window open** - the application is now running!
 
-### Step 6: Use the Application
+4. **Open your web browser** and go to: `http://localhost:5000`
 
-1. **Open your web browser** (Chrome, Firefox, etc.)
-
-2. **Go to this address:**
-   ```
-   http://localhost:5000
-   ```
-
-3. **You should see the IP Consolidator webpage!**
-
-### Step 7: Stop the Application
+### 🛑 Stop the Application
 
 **When you're done using the application:**
-
 1. **Go back to the Command Prompt/Terminal** window where the app is running
 2. **Press `Ctrl + C`** (Windows) or `Cmd + C` (Mac)
 3. **You'll see the application stop** and return to the command prompt
 
-### Troubleshooting Common Problems
+### 🔧 Troubleshooting Common Problems
 
-**Problem: "python not found"**
-- **Solution:** Python isn't installed or isn't in your PATH
-- **Fix:** Reinstall Python and make sure to check "Add Python to PATH"
+| ❌ **Problem** | 💡 **Solution** | 🔧 **Fix** |
+|---------------|----------------|------------|
+| "python not found" | Python isn't installed or isn't in your PATH | Reinstall Python and make sure to check "Add Python to PATH" |
+| "pip not found" | Try using `python -m pip` instead of just `pip` | Use `python -m pip install -r requirements.txt` |
+| "Port 5000 is already in use" | Something else is using port 5000 | Either stop the other application or change the port in your `.env` file |
+| Can't access the website | Make sure the Command Prompt/Terminal shows the app is running | Check that you typed `http://localhost:5000` correctly |
+| "Permission denied" errors | You might not have permission to write to the folder | Run Command Prompt as Administrator (Windows) or use `sudo` (Mac/Linux) |
 
-**Problem: "pip not found"**
-- **Solution:** Try using `python -m pip` instead of just `pip`
+## 📖 Usage Guide
 
-**Problem: "Port 5000 is already in use"**
-- **Solution:** Something else is using port 5000
-- **Fix:** Either stop the other application or change the port in your `.env` file
-
-**Problem: Can't access the website**
-- **Solution:** Make sure the Command Prompt/Terminal shows the app is running
-- **Fix:** Check that you typed `http://localhost:5000` correctly
-
-**Problem: "Permission denied" errors**
-- **Solution:** You might not have permission to write to the folder
-- **Fix:** Run Command Prompt as Administrator (Windows) or use `sudo` (Mac/Linux)
-
-### What Each File Does
-
-- **`app.py`** - The main application file (this is what you run)
-- **`requirements.txt`** - List of Python packages the app needs
-- **`env.example`** - Template for configuration settings
-- **`.env`** - Your actual configuration settings (you create this)
-- **`templates/`** - The webpage designs
-- **`uploads/`** - Where uploaded files are stored (created automatically)
-
-### Security Notes
-
-- **Never share your `.env` file** - it contains your secret key
-- **The application is only accessible from your computer** by default
-- **If you want others to access it**, you'll need to configure your firewall and network settings
-
-## Usage Guide (How to Use the Application)
-
-### What This Application Does
+### 🎯 What This Application Does
 
 This application helps you **consolidate IP addresses** from files. Think of it like organizing a messy drawer:
-- **Before**: You have 100 individual socks scattered everywhere
-- **After**: You have 5 organized groups of socks
-
-In networking terms:
 - **Before**: You have 100 individual IP addresses like `192.168.1.1`, `192.168.1.2`, `192.168.1.3`, etc.
 - **After**: You have 1 network group like `192.168.1.0/24` (which includes all IPs from 192.168.1.1 to 192.168.1.254)
 
-### Step-by-Step Usage Instructions
+### 📋 Step-by-Step Usage Instructions
 
-#### Step 1: Prepare Your File
+#### 📁 Step 1: Prepare Your File
 
 **What files can you use?**
 - Any text file with IP addresses
@@ -286,7 +234,7 @@ In networking terms:
 10.0.0.2
 ```
 
-#### Step 2: Upload Your File
+#### 📤 Step 2: Upload Your File
 
 1. **Make sure the application is running** (you should see the webpage at `http://localhost:5000`)
 
@@ -300,13 +248,13 @@ In networking terms:
 
 5. **Click the "Analyze Configuration" button**
 
-#### Step 3: Wait for Analysis
+#### ⏳ Step 3: Wait for Analysis
 
 1. **You'll see a progress bar** showing the analysis is running
 2. **This might take a few seconds** to a few minutes depending on your file size
 3. **Don't close the browser** or the Command Prompt/Terminal window
 
-#### Step 4: View Results
+#### 📊 Step 4: View Results
 
 **When analysis is complete, you'll see:**
 
@@ -323,42 +271,35 @@ In networking terms:
 
 3. **Detailed Results Table** showing each threshold tested
 
-#### Step 5: Choose Your Output Format
-
-**At the top of the results page, you'll see "Output Format" options:**
-
-1. **Cisco ASA Configuration**: Creates a file ready to paste into a Cisco ASA firewall
-2. **Raw IP Addresses**: Creates a simple list of the consolidated IP addresses
-
-#### Step 6: Generate and Download
+#### 📥 Step 5: Generate and Download
 
 1. **In the results table**, find the row with the threshold you want to use
 2. **Click the "Generate" button** in that row
 3. **Your file will automatically download** to your computer's Downloads folder
 4. **The button will briefly show "Downloaded"** to confirm success
 
-### Understanding the Results
+### 🧠 Understanding the Results
 
-#### What is a "Threshold"?
+#### 📊 What is a "Threshold"?
 
 A threshold is like a **tolerance level** for how much extra space you're willing to include:
 - **0% threshold**: Only include exactly the IPs you have (very precise, but might create many small groups)
 - **25% threshold**: Include up to 25% more IPs than you have (good balance)
 - **50% threshold**: Include up to 50% more IPs (creates larger groups, fewer total groups)
 
-#### What is the "Recommended Threshold"?
+#### 🎯 What is the "Recommended Threshold"?
 
 The application automatically calculates which threshold gives you the **best balance** between:
 - **Fewer network objects** (easier to manage)
 - **Not including too many extra IPs** (staying efficient)
 
-#### What are "Pareto Solutions"?
+#### ⚖️ What are "Pareto Solutions"?
 
 These are the **optimal solutions** - the ones that can't be improved in one area without making another area worse. Think of it like finding the best car:
 - You want good gas mileage AND good performance
 - You can't have both at maximum, so you find the best compromise
 
-### Example Walkthrough
+### 📝 Example Walkthrough
 
 **Let's say you have a file with these IPs:**
 ```
@@ -379,7 +320,7 @@ These are the **optimal solutions** - the ones that can't be improved in one are
 
 **The recommended threshold might be 25%** because it gives you good consolidation without including too many extra IPs.
 
-### Tips for Best Results
+### 💡 Tips for Best Results
 
 1. **Use the recommended threshold** unless you have specific requirements
 2. **Larger files work better** - the more IPs you have, the more benefit you'll see
@@ -388,69 +329,28 @@ These are the **optimal solutions** - the ones that can't be improved in one are
 5. **Use ASA format** if you're working with Cisco firewalls
 6. **Use Raw format** if you just need a simple list
 
-### Common Questions
+### ❓ Common Questions
 
-**Q: Why does it include extra IPs?**
-A: To create efficient network groups (CIDR blocks), it sometimes needs to include IPs you don't have. This is normal and expected.
+| ❓ **Question** | 💡 **Answer** |
+|----------------|---------------|
+| **Why does it include extra IPs?** | To create efficient network groups (CIDR blocks), it sometimes needs to include IPs you don't have. This is normal and expected. |
+| **Which threshold should I use?** | Start with the recommended threshold. If you need fewer groups, try a higher threshold. If you need more precision, try a lower threshold. |
+| **Can I use this for IPv6 addresses?** | Currently, this application only works with IPv4 addresses. |
+| **What if my file has errors?** | The application will show you an error message. Check that your file contains valid IP addresses and try again. |
 
-**Q: Which threshold should I use?**
-A: Start with the recommended threshold. If you need fewer groups, try a higher threshold. If you need more precision, try a lower threshold.
+## 📁 Input & Output Formats
 
-**Q: Can I use this for IPv6 addresses?**
-A: Currently, this application only works with IPv4 addresses.
+### 📄 Supported File Types
 
-**Q: What if my file has errors?**
-A: The application will show you an error message. Check that your file contains valid IP addresses and try again.
+| 📝 **File Type** | 🔧 **Description** |
+|------------------|-------------------|
+| `.txt`, `.cfg`, `.conf` | Configuration files |
+| `.csv` | Comma-separated values |
+| `.log` | Log files |
+| `.dat`, `.lst` | Data files |
+| `.ip`, `.hosts` | IP lists |
 
-## Security
-
-### Production Deployment
-
-For production deployment, ensure you:
-
-1. **Set a secure secret key**:
-   ```bash
-   # Generate a secure key
-   python -c "import secrets; print(secrets.token_hex(32))"
-   
-   # Add to your .env file
-   SECRET_KEY=your_generated_key_here
-   ```
-
-2. **Use HTTPS**: Configure SSL/TLS certificates for secure communication
-
-3. **Set proper file permissions**: Ensure the `uploads/` directory has appropriate permissions
-
-4. **Configure firewall**: Only allow necessary ports (typically 443 for HTTPS)
-
-### Security Features
-
-- **Content Security Policy (CSP)**: Prevents XSS and other injection attacks
-- **Path traversal protection**: Prevents directory traversal attacks
-- **File upload validation**: Validates file types and sizes
-- **Input sanitization**: All user inputs are validated and sanitized
-- **Secure headers**: X-Frame-Options, X-Content-Type-Options, etc.
-
-
-
-## Input Format
-
-The tool can process any file containing IPv4 addresses and CIDR networks. It automatically detects and extracts IP addresses from:
-
-- Network configuration files
-- Log files
-- CSV files
-- Text files
-- Any other file format with IP addresses
-
-### Supported File Types:
-- `.txt`, `.cfg`, `.conf` - Configuration files
-- `.csv` - Comma-separated values
-- `.log` - Log files
-- `.dat`, `.lst` - Data files
-- `.ip`, `.hosts` - IP lists
-
-### Example Input Formats:
+### 📥 Example Input Formats
 
 **ASA Configuration:**
 ```
@@ -479,23 +379,7 @@ ip,description
 10.0.0.0/16
 ```
 
-**Mixed Format:**
-```
-192.168.1.1
-192.168.2.0/24
-10.0.0.1
-172.16.0.0/12
-```
-
-## Output
-
-The tool generates:
-
-1. **Analysis Summary**: Detailed breakdown of consolidation results
-2. **Pareto Frontier**: Optimal solutions balancing objects vs. missing IPs
-3. **Network Configuration**: Ready-to-deploy network object definitions
-
-### Sample Output
+### 📤 Sample Output
 
 ```
 ! Generated with 25% missing threshold
@@ -507,36 +391,60 @@ object network 192.168.1.0
 network-object object 192.168.1.0
 ```
 
-## How It Works
+## 🔧 How It Works
 
-1. **Extract IPs**: Parses configuration files for individual host IPs
-2. **Consolidate**: Groups IPs into CIDR networks using different thresholds
-3. **Analyze**: Computes Pareto frontier for optimal trade-offs
-4. **Score**: Normalized scoring system to rank solutions
-5. **Generate**: Creates network-compatible output files
+1. **🔍 Extract IPs**: Parses configuration files for individual host IPs
+2. **⚡ Consolidate**: Groups IPs into CIDR networks using different thresholds
+3. **📊 Analyze**: Computes Pareto frontier for optimal trade-offs
+4. **🎯 Score**: Normalized scoring system to rank solutions
+5. **📤 Generate**: Creates network-compatible output files
 
-## Thresholds
+## 🔒 Security Features
 
-The tool tests multiple thresholds (0%, 10%, 20%, 25%, 30%, 35%, 40%, 45%, 50%) to find the optimal balance between:
+<div align="center">
 
-- **Objects Defined**: Number of network objects created
-- **Missing IPs**: Additional IPs included in the consolidation
-- **Expansion**: Percentage of extra IPs added
+| 🛡️ **Content Security Policy** | 🚫 **Path Traversal Protection** | ✅ **File Upload Validation** |
+|-------------------------------|--------------------------------|-----------------------------|
+| Prevents XSS and other injection attacks | Prevents directory traversal attacks | Validates file types and sizes |
 
-## Files
+| 🧹 **Input Sanitization** | 🔒 **Secure Headers** | 🔑 **Secret Key Management** |
+|---------------------------|---------------------|----------------------------|
+| All user inputs are validated and sanitized | X-Frame-Options, X-Content-Type-Options, etc. | Secure secret key handling with environment variables |
 
-- `app.py` - Flask web application
-- `templates/` - HTML templates for the web interface
-- `core_consolidation.py` - Core consolidation logic
-- `analysis.py` - Analysis and optimization functions
-- `output_generator.py` - Network output generation
-- `requirements.txt` - Python dependencies
+</div>
 
-## Requirements
+### 🚀 Production Deployment
 
-- Python 3.7+
-- Flask 2.3.3+
-- Modern web browser (Chrome, Firefox, Safari, Edge)
+For production deployment, ensure you:
+
+1. **🔑 Set a secure secret key**:
+   ```bash
+   # Generate a secure key
+   python -c "import secrets; print(secrets.token_hex(32))"
+   
+   # Add to your .env file
+   SECRET_KEY=your_generated_key_here
+   ```
+
+2. **🔒 Use HTTPS**: Configure SSL/TLS certificates for secure communication
+
+3. **📁 Set proper file permissions**: Ensure the `uploads/` directory has appropriate permissions
+
+4. **🔥 Configure firewall**: Only allow necessary ports (typically 443 for HTTPS)
+
+## 📋 Project Structure
+
+| 📄 **File** | 🔧 **Purpose** |
+|-------------|----------------|
+| `app.py` | Flask web application |
+| `templates/` | HTML templates for the web interface |
+| `core_consolidation.py` | Core consolidation logic |
+| `analysis.py` | Analysis and optimization functions |
+| `output_generator.py` | Network output generation |
+| `requirements.txt` | Python dependencies |
+| `env.example` | Template for configuration settings |
+| `.env` | Your actual configuration settings (you create this) |
+| `uploads/` | Where uploaded files are stored (created automatically) |
 
 ## 📄 License
 
@@ -564,6 +472,4 @@ Feel free to submit issues, feature requests, or pull requests to improve the to
   <img src="https://img.shields.io/badge/Network%20Security-Cisco%20ASA-007ACC?style=for-the-badge&logo=cisco&logoColor=white" alt="Cisco ASA">
   <img src="https://img.shields.io/badge/Python-Flask-FF6B6B?style=for-the-badge&logo=python&logoColor=white" alt="Python Flask">
   <img src="https://img.shields.io/badge/Web%20Development-Modern%20UI-28A745?style=for-the-badge&logo=web&logoColor=white" alt="Web Development">
-</div>
-
 </div>
