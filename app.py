@@ -4,9 +4,12 @@ Flask web application for IP Consolidator
 Provides a simple web interface for the consolidation tool
 """
 
-from flask import Flask, render_template, request, jsonify, send_file, flash, redirect, url_for
+from flask import Flask, render_template, request, jsonify, send_file, flash, redirect, url_for, session
 import os
 import json
+import hashlib
+import time
+import threading
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from core_consolidation import extract_host_ips
@@ -34,6 +37,78 @@ def get_secret_key():
 
 app.secret_key = get_secret_key()
 
+def delayed_file_cleanup(file_path, delay_seconds=300):
+    """Clean up file after a configurable delay with retry mechanism"""
+    def cleanup():
+        # Wait for initial delay
+        time.sleep(delay_seconds)
+        
+        # Try to clean up the file, with retries every 30 seconds
+        retry_interval = 30  # seconds
+        max_retries = 20  # Maximum 10 minutes of retries (20 * 30 seconds)
+        retry_count = 0
+        
+        while retry_count < max_retries:
+            try:
+                if os.path.exists(file_path):
+                    os.unlink(file_path)
+                    print(f"Cleaned up file after {delay_seconds + (retry_count * retry_interval)} seconds: {os.path.basename(file_path)}")
+                    return  # Successfully cleaned up, exit the loop
+                else:
+                    print(f"File no longer exists: {os.path.basename(file_path)}")
+                    return  # File already gone, exit the loop
+            except PermissionError:
+                # File might be in use (being downloaded), retry
+                retry_count += 1
+                if retry_count < max_retries:
+                    print(f"File in use, retrying cleanup in {retry_interval} seconds: {os.path.basename(file_path)} (attempt {retry_count}/{max_retries})")
+                    time.sleep(retry_interval)
+                else:
+                    print(f"Failed to clean up file after {max_retries} retries: {os.path.basename(file_path)}")
+            except Exception as e:
+                print(f"Error cleaning up file {os.path.basename(file_path)}: {e}")
+                return  # Exit on other errors
+    
+    # Start cleanup thread
+    cleanup_thread = threading.Thread(target=cleanup, daemon=True)
+    cleanup_thread.start()
+
+def immediate_file_cleanup(file_path):
+    """Clean up file after 30 second delay with retry mechanism every 30 seconds"""
+    def cleanup():
+        # Wait 30 seconds before first attempt
+        initial_delay = 30  # seconds
+        time.sleep(initial_delay)
+        
+        retry_interval = 30  # seconds
+        max_retries = 10  # Maximum 5 minutes of retries (10 * 30 seconds)
+        retry_count = 0
+        
+        while retry_count < max_retries:
+            try:
+                if os.path.exists(file_path):
+                    os.unlink(file_path)
+                    print(f"Cleaned up file after {initial_delay + (retry_count * retry_interval)} seconds: {os.path.basename(file_path)}")
+                    return  # Successfully cleaned up, exit the loop
+                else:
+                    print(f"File no longer exists: {os.path.basename(file_path)}")
+                    return  # File already gone, exit the loop
+            except PermissionError:
+                # File might be in use (being downloaded), retry
+                retry_count += 1
+                if retry_count < max_retries:
+                    print(f"File in use, retrying cleanup in {retry_interval} seconds: {os.path.basename(file_path)} (attempt {retry_count}/{max_retries})")
+                    time.sleep(retry_interval)
+                else:
+                    print(f"Failed to clean up file after {initial_delay + (max_retries * retry_interval)} seconds: {os.path.basename(file_path)}")
+            except Exception as e:
+                print(f"Error cleaning up file {os.path.basename(file_path)}: {e}")
+                return  # Exit on other errors
+    
+    # Start cleanup thread
+    cleanup_thread = threading.Thread(target=cleanup, daemon=True)
+    cleanup_thread.start()
+
 # Security headers
 @app.after_request
 def add_security_headers(response):
@@ -59,6 +134,85 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+def generate_secure_filename(original_filename, file_content=None):
+    """
+    Generate a secure, hashed filename to prevent information leakage
+    """
+    # Get file extension from original filename
+    if '.' in original_filename:
+        extension = '.' + original_filename.rsplit('.', 1)[1].lower()
+    else:
+        extension = ''
+    
+    # Create a unique identifier using timestamp and random data
+    timestamp = str(int(time.time() * 1000000))  # Microsecond precision
+    random_salt = os.urandom(16).hex()  # 32 character random salt
+    
+    # If we have file content, hash it for additional uniqueness
+    if file_content:
+        content_hash = hashlib.sha256(file_content).hexdigest()[:16]
+        base_name = f"{content_hash}_{timestamp}{random_salt}"
+    else:
+        base_name = f"{timestamp}{random_salt}"
+    
+    return base_name + extension
+
+def cleanup_uploads():
+    """Clean up all files in the uploads directory"""
+    import shutil
+    try:
+        # Remove all files in uploads directory
+        for filename in os.listdir(UPLOAD_FOLDER):
+            # Additional security: validate filename before deletion
+            if '..' in filename or '/' in filename or '\\' in filename:
+                print(f"Skipping suspicious filename: {filename}")
+                continue
+                
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            
+            # Additional security: ensure file is within upload directory
+            real_file_path = os.path.realpath(file_path)
+            real_upload_path = os.path.realpath(UPLOAD_FOLDER)
+            
+            if not real_file_path.startswith(real_upload_path):
+                print(f"Skipping file outside upload directory: {filename}")
+                continue
+                
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        print(f"Cleaned up {UPLOAD_FOLDER} directory")
+    except Exception as e:
+        print(f"Error cleaning uploads: {e}")
+
+def cleanup_session_files():
+    """Clean up session-specific files"""
+    try:
+        # Get current session file references
+        analysis_file = session.get('analysis_file')
+        networks_file = session.get('networks_file')
+        
+        # Clean up analysis file
+        if analysis_file:
+            analysis_filepath = os.path.join(UPLOAD_FOLDER, analysis_file)
+            if os.path.exists(analysis_filepath):
+                os.unlink(analysis_filepath)
+                print(f"Cleaned up session analysis file: {analysis_file}")
+        
+        # Clean up networks file
+        if networks_file:
+            networks_filepath = os.path.join(UPLOAD_FOLDER, networks_file)
+            if os.path.exists(networks_filepath):
+                os.unlink(networks_filepath)
+                print(f"Cleaned up session networks file: {networks_file}")
+                
+    except Exception as e:
+        print(f"Error cleaning session files: {e}")
+
+# Clean up uploads directory on startup
+cleanup_uploads()
+
 def allowed_file(filename):
     """Check if file extension is allowed"""
     if not filename or '.' not in filename:
@@ -74,6 +228,11 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     """Main page"""
+    # Clean up any existing session files
+    cleanup_session_files()
+    # Clear any existing session data when starting fresh
+    session.pop('analysis_file', None)
+    session.pop('networks_file', None)
     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
@@ -99,8 +258,13 @@ def upload_file():
             flash(f'File too large. Maximum size is 100MB. Your file is {file_size / (1024*1024):.1f}MB')
             return redirect(url_for('index'))
         
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        # Read file content for hashing
+        file_content = file.read()
+        file.seek(0)  # Reset file pointer for processing
+        
+        # Generate secure filename
+        secure_filename_hash = generate_secure_filename(file.filename, file_content)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename_hash)
         file.save(filepath)
         
         try:
@@ -119,11 +283,23 @@ def upload_file():
             recommended = min(frontier, key=lambda r: r['score'])
             
             # Store results in session or temporary storage
+            # Convert IPv4Network objects to strings for JSON serialization
+            serializable_results = []
+            for result in results:
+                serializable_result = result.copy()
+                serializable_result['networks'] = [str(network) for network in result['networks']]
+                serializable_results.append(serializable_result)
+            
+            serializable_frontier = []
+            for frontier_result in frontier:
+                serializable_frontier_result = frontier_result.copy()
+                serializable_frontier_result['networks'] = [str(network) for network in frontier_result['networks']]
+                serializable_frontier.append(serializable_frontier_result)
+            
             analysis_data = {
-                'filename': filename,
                 'host_ips_count': len(host_ips),
-                'results': results,
-                'frontier': frontier,
+                'results': serializable_results,
+                'frontier': serializable_frontier,
                 'filepath': filepath,
                 'recommended': {
                     'threshold': recommended['threshold'],
@@ -134,16 +310,15 @@ def upload_file():
                 }
             }
             
-            # Store in a simple way (in production, use proper session management)
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], 'analysis_data.json'), 'w') as f:
-                json.dump(analysis_data, f, default=str)
+            # Store data in temporary files to avoid session size limits
+            # Generate unique session ID for this analysis
+            session_id = f"session_{int(time.time() * 1000000)}{os.urandom(8).hex()}"
             
-            # Store networks as strings for safe JSON serialization
+            # Create networks data
             networks_data = {
-                'filename': filename,
                 'host_ips_count': len(host_ips),
-                'results': results,
-                'frontier': frontier,
+                'results': serializable_results,
+                'frontier': serializable_frontier,
                 'filepath': filepath,
                 'recommended': {
                     'threshold': recommended['threshold'],
@@ -162,8 +337,30 @@ def upload_file():
                     str(network) for network in result['networks']
                 ]
             
-            with open(os.path.join(app.config['UPLOAD_FOLDER'], 'networks_data.json'), 'w') as f:
+            # Store analysis data in file
+            analysis_filename = f"analysis_{session_id}.json"
+            analysis_filepath = os.path.join(app.config['UPLOAD_FOLDER'], analysis_filename)
+            with open(analysis_filepath, 'w') as f:
+                json.dump(analysis_data, f, default=str)
+            
+            # Store networks data in file
+            networks_filename = f"networks_{session_id}.json"
+            networks_filepath = os.path.join(app.config['UPLOAD_FOLDER'], networks_filename)
+            with open(networks_filepath, 'w') as f:
                 json.dump(networks_data, f, default=str)
+            
+            # Store only file references in session
+            session['analysis_file'] = analysis_filename
+            session['networks_file'] = networks_filename
+            
+            # Clean up uploaded file after processing
+            try:
+                os.unlink(filepath)
+                print(f"Cleaned up uploaded file: {secure_filename_hash}")
+            except Exception as e:
+                print(f"Error cleaning up uploaded file: {e}")
+            
+
             
             flash(f'Successfully processed {len(host_ips)} host IPs')
             return redirect(url_for('results'))
@@ -178,25 +375,36 @@ def upload_file():
 @app.route('/results')
 def results():
     """Display analysis results"""
-    try:
-        with open(os.path.join(app.config['UPLOAD_FOLDER'], 'analysis_data.json'), 'r') as f:
-            analysis_data = json.load(f)
-        # Backfill recommended if missing (for older analysis files)
-        if 'recommended' not in analysis_data or not analysis_data.get('recommended'):
-            frontier = analysis_data.get('frontier', [])
-            if frontier:
-                best = min(frontier, key=lambda r: r.get('score', float('inf')))
-                analysis_data['recommended'] = {
-                    'threshold': best.get('threshold'),
-                    'score': best.get('score'),
-                    'objects_defined': best.get('objects_defined'),
-                    'missing_ips_included': best.get('missing_ips_included'),
-                    'expansion_percent': best.get('expansion_percent'),
-                }
-        return render_template('results.html', data=analysis_data)
-    except FileNotFoundError:
+    # Get file references from session
+    analysis_file = session.get('analysis_file')
+    
+    if not analysis_file:
         flash('No analysis data found. Please upload a file first.')
         return redirect(url_for('index'))
+    
+    # Load data from file
+    analysis_filepath = os.path.join(app.config['UPLOAD_FOLDER'], analysis_file)
+    if not os.path.exists(analysis_filepath):
+        flash('Analysis data not found. Please upload a file first.')
+        return redirect(url_for('index'))
+    
+    with open(analysis_filepath, 'r') as f:
+        analysis_data = json.load(f)
+    
+    # Backfill recommended if missing (for older analysis files)
+    if 'recommended' not in analysis_data or not analysis_data.get('recommended'):
+        frontier = analysis_data.get('frontier', [])
+        if frontier:
+            best = min(frontier, key=lambda r: r.get('score', float('inf')))
+            analysis_data['recommended'] = {
+                'threshold': best.get('threshold'),
+                'score': best.get('score'),
+                'objects_defined': best.get('objects_defined'),
+                'missing_ips_included': best.get('missing_ips_included'),
+                'expansion_percent': best.get('expansion_percent'),
+            }
+    
+    return render_template('results.html', data=analysis_data)
 
 @app.route('/api/generate_output', methods=['POST'])
 def generate_output():
@@ -221,9 +429,21 @@ def generate_output():
         if output_format not in ['asa', 'raw']:
             return jsonify({'error': 'Invalid output format'}), 400
         
-        # Load the networks data from JSON
-        with open(os.path.join(app.config['UPLOAD_FOLDER'], 'networks_data.json'), 'r') as f:
+        # Load the networks data from file
+        networks_file = session.get('networks_file')
+        
+        if not networks_file:
+            return jsonify({'error': 'No networks data found. Please upload a file first.'}), 404
+        
+        # Load data from file
+        networks_filepath = os.path.join(app.config['UPLOAD_FOLDER'], networks_file)
+        if not os.path.exists(networks_filepath):
+            return jsonify({'error': 'Networks data not found. Please upload a file first.'}), 404
+        
+        with open(networks_filepath, 'r') as f:
             networks_data = json.load(f)
+        
+
         
         # Find the result for the specified threshold
         result = None
@@ -247,19 +467,23 @@ def generate_output():
             # Generate ASA output
             object_lines, group_lines = generate_asa_output(networks, threshold)
             
-            # Create temporary file
-            output_filename = f"asa_output_{threshold}percent.txt"
+            # Create temporary file with unique naming
+            timestamp = int(time.time() * 1000000)  # Microsecond precision
+            random_suffix = os.urandom(8).hex()  # 16 character random suffix
+            output_filename = f"asa_output_{threshold}percent_{timestamp}{random_suffix}.txt"
             output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
             
             write_asa_file(object_lines, group_lines, threshold, output_path)
         else:  # raw format
             # Generate raw IP addresses
-            output_filename = f"raw_ips_{threshold}percent.txt"
+            timestamp = int(time.time() * 1000000)  # Microsecond precision
+            random_suffix = os.urandom(8).hex()  # 16 character random suffix
+            output_filename = f"raw_ips_{threshold}percent_{timestamp}{random_suffix}.txt"
             output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
             
             with open(output_path, 'w') as f:
                 f.write(f"# Raw IP Addresses for {threshold}% threshold\n")
-                f.write(f"# Generated from {networks_data['filename']}\n")
+                f.write(f"# Generated from uploaded file\n")
                 f.write(f"# Objects: {result['objects_defined']}\n")
                 f.write(f"# Missing IPs: {result['missing_ips_included']}\n")
                 f.write(f"# Expansion: {result['expansion_percent']:.1f}%\n\n")
@@ -295,8 +519,16 @@ def download_file(filename):
             'raw_ips_'
         ]
         
+        # Validate that filename matches expected pattern with unique suffix
         if not any(filename.startswith(pattern) for pattern in allowed_patterns):
             flash('Invalid file type')
+            return redirect(url_for('index'))
+        
+        # Additional validation: ensure filename has the expected format with timestamp and random suffix
+        if not (filename.endswith('.txt') and 
+                ('percent_' in filename) and 
+                len(filename.split('_')) >= 4):  # Should have at least 4 parts: type, threshold, percent, timestamp+suffix
+            flash('Invalid filename format')
             return redirect(url_for('index'))
         
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -309,11 +541,19 @@ def download_file(filename):
             flash('Access denied')
             return redirect(url_for('index'))
         
-        return send_file(
+        # Send file
+        response = send_file(
             file_path,
             as_attachment=True,
             download_name=filename
         )
+        
+        # Schedule cleanup with 30-second initial delay and retry mechanism
+        # This will wait 30 seconds, then try to delete the file and retry every 30 seconds
+        immediate_file_cleanup(file_path)
+        print(f"Scheduled cleanup for {filename} with 30-second initial delay and retries")
+        
+        return response
     except FileNotFoundError:
         flash('File not found')
         return redirect(url_for('index'))
@@ -321,12 +561,33 @@ def download_file(filename):
 @app.route('/api/analysis_data')
 def get_analysis_data():
     """Get analysis data for AJAX requests"""
-    try:
-        with open(os.path.join(app.config['UPLOAD_FOLDER'], 'analysis_data.json'), 'r') as f:
-            analysis_data = json.load(f)
-        return jsonify(analysis_data)
-    except FileNotFoundError:
+    # Get file references from session
+    analysis_file = session.get('analysis_file')
+    
+    if not analysis_file:
         return jsonify({'error': 'No analysis data found'}), 404
+    
+    # Load data from file
+    analysis_filepath = os.path.join(app.config['UPLOAD_FOLDER'], analysis_file)
+    if not os.path.exists(analysis_filepath):
+        return jsonify({'error': 'Analysis data not found'}), 404
+    
+    with open(analysis_filepath, 'r') as f:
+        analysis_data = json.load(f)
+    
+    return jsonify(analysis_data)
+
+@app.route('/api/cleanup', methods=['POST'])
+def api_cleanup():
+    """API endpoint to manually clean up uploads directory and session data"""
+    try:
+        cleanup_uploads()
+        # Clear session data
+        session.pop('analysis_file', None)
+        session.pop('networks_file', None)
+        return jsonify({'success': True, 'message': 'Uploads directory and session data cleaned successfully'})
+    except Exception as e:
+        return jsonify({'error': f'Error cleaning up: {str(e)}'}), 500
 
 if __name__ == '__main__':
     # Get configuration from environment variables

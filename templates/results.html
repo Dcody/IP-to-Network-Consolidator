@@ -13,7 +13,6 @@
                     Analysis Results
                 </h2>
                 <p class="text-muted mb-0">
-                    File: <strong>{{ data.filename }}</strong> | 
                     Host IPs: <strong>{{ data.host_ips_count }}</strong>
                 </p>
             </div>
@@ -182,9 +181,6 @@
             </div>
         </div>
 
-
-
-
     </div>
 </div>
 {% endblock %}
@@ -333,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.body.removeChild(link);
                 
                 // Show brief success feedback
-                                     btn.innerHTML = '<i class="fas fa-check me-1"></i>Downloaded';
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Downloaded';
                 setTimeout(() => {
                     btn.innerHTML = originalText;
                 }, 2000);

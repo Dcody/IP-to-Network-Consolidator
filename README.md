@@ -429,6 +429,30 @@ network-object object 192.168.1.0
 
 </div>
 
+## 🧹 File Cleanup System
+
+The application includes an intelligent delayed file cleanup system with retry mechanism:
+
+### ⏰ **Delayed Cleanup with Retry**
+- Generated files are scheduled for cleanup with a 30-second initial delay
+- Each generated file has a unique filename to prevent conflicts and ensure proper cleanup
+- After the delay, if the file is still in use (being downloaded), the system retries every 30 seconds
+- Maximum retry period of 5 minutes (10 retries × 30 seconds)
+- This ensures files are cleaned up as soon as possible after downloads complete
+
+### 🔄 **Retry Logic**
+- **Initial Delay**: Waits 30 seconds before first cleanup attempt
+- **Retry Attempts**: Every 30 seconds if file is in use
+- **Success**: File is deleted as soon as it's no longer in use
+- **Timeout**: Stops retrying after 10 attempts (5 minutes total)
+- **Error Handling**: Distinguishes between "file in use" and other errors
+
+### ⚙️ **Configuration**
+```bash
+# Note: The CLEANUP_DELAY_SECONDS setting is no longer used
+# Files are now cleaned up immediately with 30-second retries
+```
+
 ### 🚀 Production Deployment
 
 For production deployment, ensure you:
