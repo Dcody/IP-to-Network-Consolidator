@@ -2,10 +2,26 @@
 
 <div align="center">
 
+<div style="background-color: #ff6b6b; color: white; padding: 20px; border-radius: 10px; margin: 20px 0; border: 3px solid #d63031;">
+
+## ⚠️ **IMPORTANT WARNING** ⚠️
+
+### 🎮 **This is a TOY PROJECT for educational purposes only!**
+
+**🚫 DO NOT use this in production environments**  
+**🚫 DO NOT use this for real network security**  
+**🚫 DO NOT use this in enterprise environments**
+
+This project was created for learning and experimentation. It lacks proper security measures, error handling, and production-ready features.
+
+**Use at your own risk!**
+
+</div>
+
 ![Python](https://img.shields.io/badge/Python-3.7+-blue.svg?style=for-the-badge&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-2.3.3-red.svg?style=for-the-badge&logo=flask&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Toy%20Project-orange.svg?style=for-the-badge)
 
 **A powerful tool for consolidating individual IP addresses from any file format into efficient CIDR networks, with special optimization for network configurations including Cisco ASA.**
 
