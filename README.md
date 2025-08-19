@@ -1,32 +1,71 @@
-# IP Consolidator
+# 🌐 IP Consolidator
 
-A powerful tool for consolidating individual IP addresses from any file format into efficient CIDR networks, with special optimization for network configurations including Cisco ASA.
+<div align="center">
 
-## Features
+![Python](https://img.shields.io/badge/Python-3.7+-blue.svg?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-2.3.3-red.svg?style=for-the-badge&logo=flask&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg?style=for-the-badge)
 
-- **Smart Analysis**: Multi-threshold analysis to find optimal balance between object count and IP coverage
-- **Efficient Consolidation**: Reduce hundreds of individual host objects into optimized CIDR networks
-- **Web Interface**: Modern, responsive web UI for easy file upload and analysis
-- **Visual Analytics**: Interactive charts showing Pareto frontier and score distribution
-- **Network-Ready Output**: Generate network configuration files ready for deployment
+**A powerful tool for consolidating individual IP addresses from any file format into efficient CIDR networks, with special optimization for network configurations including Cisco ASA.**
 
-## Web Interface
+[🚀 Quick Start](#installation--setup-step-by-step-guide) • [📊 Features](#features) • [🌐 Web Interface](#web-interface) • [📖 Documentation](#documentation)
+
+</div>
+
+---
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Network%20Optimization-IP%20Consolidation-007ACC?style=for-the-badge&logo=cisco&logoColor=white" alt="Network Optimization">
+  <img src="https://img.shields.io/badge/Web%20Interface-Modern%20UI-FF6B6B?style=for-the-badge&logo=flask&logoColor=white" alt="Web Interface">
+  <img src="https://img.shields.io/badge/File%20Support-Multiple%20Formats-28A745?style=for-the-badge&logo=file&logoColor=white" alt="File Support">
+</div>
+
+## 🚀 Features
+
+<div align="center">
+
+| 🔍 **Smart Analysis** | ⚡ **Efficient Consolidation** | 🌐 **Web Interface** |
+|----------------------|-------------------------------|---------------------|
+| Multi-threshold analysis to find optimal balance between object count and IP coverage | Reduce hundreds of individual host objects into optimized CIDR networks | Modern, responsive web UI for easy file upload and analysis |
+
+| 📊 **Visual Analytics** | 🔧 **Network-Ready Output** | 📁 **Multi-Format Support** |
+|------------------------|----------------------------|---------------------------|
+| Interactive charts showing Pareto frontier and score distribution | Generate network configuration files ready for deployment | Supports txt, cfg, conf, csv, log, dat, lst, ip, hosts files |
+
+</div>
+
+## 🌐 Web Interface
 
 The project now includes a modern web interface built with Flask that provides:
 
-- **Drag & Drop File Upload**: Easy file upload with visual feedback
-- **Real-time Analysis**: Instant processing and results display
-- **Interactive Charts**: Visual representation of consolidation results
-- **Download Generation**: Generate and download network configuration files
-- **Responsive Design**: Works on desktop and mobile devices
+<div align="center">
 
-## Installation & Setup (Step-by-Step Guide)
+| 🎯 **Drag & Drop Upload** | ⚡ **Real-time Analysis** | 📊 **Interactive Charts** |
+|---------------------------|---------------------------|---------------------------|
+| Easy file upload with visual feedback | Instant processing and results display | Visual representation of consolidation results |
 
-### Prerequisites - What You Need First
+| 📥 **Download Generation** | 📱 **Responsive Design** | 🔒 **Security Features** |
+|---------------------------|-------------------------|-------------------------|
+| Generate and download network configuration files | Works on desktop and mobile devices | File validation, path traversal protection, CSP headers |
+
+</div>
+
+## 🛠️ Installation & Setup (Step-by-Step Guide)
+
+### 📋 Prerequisites - What You Need First
 
 **You need these things installed on your computer:**
 
-1. **Python** (version 3.7 or newer)
+<div align="center">
+
+| 🐍 **Python** | 📝 **Text Editor** | 🌐 **Web Browser** |
+|---------------|-------------------|-------------------|
+| Version 3.7 or newer | Notepad++, VS Code, or regular Notepad | Chrome, Firefox, Safari, or Edge |
+
+</div>
+
+1. **🐍 Python** (version 3.7 or newer)
    - Go to [python.org](https://python.org)
    - Download the latest version for your operating system
    - **IMPORTANT**: During installation, check the box that says "Add Python to PATH"
@@ -35,14 +74,22 @@ The project now includes a modern web interface built with Flask that provides:
 
 3. **A web browser** (Chrome, Firefox, Safari, or Edge)
 
-### Step 1: Get the Application Files
+### 📥 Step 1: Get the Application Files
 
-**Option A: Download as ZIP (Easiest)**
+<div align="center">
+
+| 📦 **Option A: Download as ZIP** | 🔧 **Option B: Using Git** |
+|----------------------------------|----------------------------|
+| **Easiest method** | **For advanced users** |
+
+</div>
+
+**📦 Option A: Download as ZIP (Easiest)**
 1. Click the green "Code" button on this page
 2. Select "Download ZIP"
 3. Extract the ZIP file to a folder on your computer (like `C:\IP_Consolidator`)
 
-**Option B: Using Git (If you have Git installed)**
+**🔧 Option B: Using Git (If you have Git installed)**
 1. Open Command Prompt (Windows) or Terminal (Mac/Linux)
 2. Navigate to where you want the files:
    ```bash
@@ -50,12 +97,20 @@ The project now includes a modern web interface built with Flask that provides:
    ```
 3. Download the files:
    ```bash
-   git clone [repository-url]
+   git clone https://github.com/Dcody/IP-to-Network-Consolidator.git
    ```
 
-### Step 2: Open Command Prompt/Terminal
+### 💻 Step 2: Open Command Prompt/Terminal
 
-**Windows:**
+<div align="center">
+
+| 🪟 **Windows** | 🍎 **Mac/Linux** |
+|----------------|------------------|
+| Press `Windows + R`, type `cmd`, press Enter | Open Terminal application |
+
+</div>
+
+**🪟 Windows:**
 1. Press `Windows + R` on your keyboard
 2. Type `cmd` and press Enter
 3. Navigate to your project folder:
@@ -63,41 +118,57 @@ The project now includes a modern web interface built with Flask that provides:
    cd C:\IP_Consolidator
    ```
 
-**Mac/Linux:**
+**🍎 Mac/Linux:**
 1. Open Terminal
 2. Navigate to your project folder:
    ```bash
    cd /path/to/IP_Consolidator
    ```
 
-### Step 3: Install Python Dependencies
+### 📦 Step 3: Install Python Dependencies
 
 **What this does:** This downloads all the extra software the application needs to work.
+
+<div align="center">
+
+| ⚡ **Primary Command** | 🔄 **Alternative Command** |
+|----------------------|---------------------------|
+| `pip install -r requirements.txt` | `python -m pip install -r requirements.txt` |
+
+</div>
 
 1. In your Command Prompt/Terminal, type this command and press Enter:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Wait for it to finish** - you'll see lots of text scrolling by. This is normal!
+2. **⏳ Wait for it to finish** - you'll see lots of text scrolling by. This is normal!
 
-3. **If you get an error** saying "pip not found":
+3. **❌ If you get an error** saying "pip not found":
    - Make sure Python is installed correctly
    - Try this command instead:
    ```bash
    python -m pip install -r requirements.txt
    ```
 
-### Step 4: Set Up Security (Optional but Recommended)
+### 🔒 Step 4: Set Up Security (Optional but Recommended)
 
 **What this does:** This makes your application more secure by setting up a secret password.
 
-1. **Generate a secret key** (this is like a password for your app):
+<div align="center">
+
+| 🔑 **Generate Key** | 📋 **Copy String** | ⚙️ **Configure** |
+|-------------------|-------------------|-----------------|
+| Create a secure secret key | Copy the generated string | Add to environment file |
+
+</div>
+
+1. **🔑 Generate a secret key** (this is like a password for your app):
    ```bash
    python -c "import secrets; print(secrets.token_hex(32))"
    ```
 
-2. **Copy the long string** that appears (it will look like: `a1b2c3d4e5f6...`)
+2. **📋 Copy the long string** that appears (it will look like: `a1b2c3d4e5f6...`)
 
 3. **Create a configuration file:**
    - In your project folder, find the file called `env.example`
@@ -467,10 +538,32 @@ The tool tests multiple thresholds (0%, 10%, 20%, 25%, 30%, 35%, 40%, 45%, 50%) 
 - Flask 2.3.3+
 - Modern web browser (Chrome, Firefox, Safari, Edge)
 
-## License
+## 📄 License
 
 This project is open source and available under the MIT License.
 
-## Contributing
+## 🤝 Contributing
 
 Feel free to submit issues, feature requests, or pull requests to improve the tool.
+
+---
+
+<div align="center">
+
+### 🌟 **Star this repository if you find it useful!**
+
+[![GitHub stars](https://img.shields.io/github/stars/Dcody/IP-to-Network-Consolidator?style=social)](https://github.com/Dcody/IP-to-Network-Consolidator)
+[![GitHub forks](https://img.shields.io/github/forks/Dcody/IP-to-Network-Consolidator?style=social)](https://github.com/Dcody/IP-to-Network-Consolidator)
+[![GitHub issues](https://img.shields.io/github/issues/Dcody/IP-to-Network-Consolidator)](https://github.com/Dcody/IP-to-Network-Consolidator/issues)
+
+---
+
+**Made with ❤️ for network administrators and security professionals**
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Network%20Security-Cisco%20ASA-007ACC?style=for-the-badge&logo=cisco&logoColor=white" alt="Cisco ASA">
+  <img src="https://img.shields.io/badge/Python-Flask-FF6B6B?style=for-the-badge&logo=python&logoColor=white" alt="Python Flask">
+  <img src="https://img.shields.io/badge/Web%20Development-Modern%20UI-28A745?style=for-the-badge&logo=web&logoColor=white" alt="Web Development">
+</div>
+
+</div>
