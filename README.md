@@ -18,9 +18,9 @@ This project was created for learning and experimentation. It lacks proper secur
 
 </div>
 
-![Python](https://img.shields.io/badge/Python-3.7+-blue.svg?style=for-the-badge&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-2.3.3-red.svg?style=for-the-badge&logo=flask&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
+[![Python](https://img.shields.io/badge/Python-3.7+-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-2.3.3-red.svg?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 ![Status](https://img.shields.io/badge/Status-Toy%20Project-orange.svg?style=for-the-badge)
 
 **A powerful tool for consolidating individual IP addresses from any file format into efficient CIDR networks, with special optimization for network configurations including Cisco ASA.**
