@@ -5,6 +5,7 @@ Provides a simple web interface for the consolidation tool
 """
 
 from flask import Flask, render_template, request, jsonify, send_file, flash, redirect, url_for, session
+from flask_compress import Compress
 import os
 import json
 import hashlib
@@ -20,6 +21,24 @@ from output_generator import generate_asa_output, write_asa_file
 load_dotenv()
 
 app = Flask(__name__)
+
+# Enable compression for all responses
+Compress(app)
+
+# Configure compression settings
+app.config['COMPRESS_MIMETYPES'] = [
+    'text/html',
+    'text/css',
+    'text/xml',
+    'application/json',
+    'application/javascript',
+    'application/xml+rss',
+    'text/plain',
+    'text/javascript'
+]
+
+app.config['COMPRESS_LEVEL'] = 6  # Balance between compression and speed
+app.config['COMPRESS_MIN_SIZE'] = 500  # Only compress files larger than 500 bytes
 
 # Improved secret key handling
 def get_secret_key():
@@ -86,9 +105,13 @@ def add_security_headers(response):
         "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
         "font-src 'self' https://cdn.jsdelivr.net; "
-        "img-src 'self' data:; "
+        "img-src 'self' data: blob:; "
         "connect-src 'self';"
     )
+    
+    # Add compression-friendly headers
+    response.headers['Vary'] = 'Accept-Encoding'
+    response.headers['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
     return response
 
 # Configuration
@@ -554,6 +577,29 @@ def api_cleanup():
         return jsonify({'success': True, 'message': 'Uploads directory and session data cleaned successfully'})
     except Exception as e:
         return jsonify({'error': f'Error cleaning up: {str(e)}'}), 500
+
+@app.route('/api/compression-test')
+def api_compression_test():
+    """Test endpoint to demonstrate compression with large JSON response"""
+    # Generate a large JSON response to demonstrate compression
+    large_data = {
+        'message': 'This is a test of compression',
+        'timestamp': time.time(),
+        'data': []
+    }
+    
+    # Add 1000 items to make the response large enough to compress
+    for i in range(1000):
+        large_data['data'].append({
+            'id': i,
+            'name': f'Item {i}',
+            'description': f'This is a detailed description for item {i} that contains a lot of text to demonstrate compression effectiveness. The more text we have, the better compression will work.',
+            'value': i * 1.5,
+            'active': i % 2 == 0,
+            'tags': [f'tag{j}' for j in range(5)]
+        })
+    
+    return jsonify(large_data)
 
 if __name__ == '__main__':
     # Get configuration from environment variables

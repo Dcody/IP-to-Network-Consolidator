@@ -429,6 +429,36 @@ network-object object 192.168.1.0
 
 </div>
 
+## 🗜️ Compression & Performance
+
+The application includes automatic text compression to reduce bandwidth usage and improve loading times:
+
+### ⚡ **Gzip Compression**
+- **Automatic Compression**: All text-based resources (HTML, CSS, JS, JSON) are automatically compressed
+- **Compression Level**: Optimized level 6 for balance between compression and speed
+- **Minimum Size**: Only compresses files larger than 500 bytes to avoid overhead
+- **Supported Types**: HTML, CSS, JavaScript, JSON, XML, and plain text
+
+### 📊 **Performance Benefits**
+- **Bandwidth Reduction**: Typically reduces file sizes by 60-80%
+- **Faster Loading**: Smaller files transfer faster, especially on slower connections
+- **Better SEO**: Faster page loads improve search engine rankings
+- **User Experience**: Reduced loading times improve user satisfaction
+
+### 🔧 **Configuration**
+```python
+# Compression settings in app.py
+app.config['COMPRESS_MIMETYPES'] = [
+    'text/html', 'text/css', 'text/xml', 'application/json',
+    'application/javascript', 'text/plain', 'text/javascript'
+]
+app.config['COMPRESS_LEVEL'] = 6  # Balance between compression and speed
+app.config['COMPRESS_MIN_SIZE'] = 500  # Only compress files > 500 bytes
+```
+
+### 🧪 **Testing Compression**
+Visit `/api/compression-test` to see compression in action with a large JSON response.
+
 ## 🧹 File Cleanup System
 
 The application includes an intelligent delayed file cleanup system with retry mechanism:
