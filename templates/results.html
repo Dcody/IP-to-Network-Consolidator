@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results - IP Consolidator{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Analysis Results
+                </h2>
+                <p class="text-muted mb-0">
+                    File: <strong>{{ data.filename }}</strong> | 
+                    Host IPs: <strong>{{ data.host_ips_count }}</strong>
+                </p>
+            </div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>
+                New Analysis
+            </a>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">Total IPs</h6>
+                            <h3 class="mb-0">{{ data.host_ips_count }}</h3>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-network-wired fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">Thresholds Tested</h6>
+                            <h3 class="mb-0">{{ data.results|length }}</h3>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-sliders-h fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">Pareto Solutions</h6>
+                            <h3 class="mb-0">{{ data.frontier|length }}</h3>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">Best Score</h6>
+                            <h3 class="mb-0">{{ "%.3f"|format(data.recommended.score) }}</h3>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-trophy fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="stats-card">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">Recommended Threshold</h6>
+                            <h3 class="mb-0">{{ data.recommended.threshold }}%</h3>
+                        </div>
+                        <div class="text-end">
+                            <i class="fas fa-bullseye fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Format Selector -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-cog me-2"></i>
+                    Output Format
+                </h5>
+                <p class="card-text text-muted mb-3">
+                    Choose the output format. Files will be automatically downloaded when generated.
+                </p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="outputFormat" class="form-label">Output Format</label>
+                        <select class="form-select" id="outputFormat">
+                            <option value="asa">Network Configuration (ASA Format)</option>
+                            <option value="raw">Raw IP Addresses</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Objects vs Missing IPs
+                        </h5>
+                        <canvas id="objectsVsMissingChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-pie me-2"></i>
+                            Score Distribution
+                        </h5>
+                        <canvas id="scoreChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-table me-2"></i>
+                    Detailed Analysis Results
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Threshold (%)</th>
+                                <th>Objects</th>
+                                <th>Missing IPs</th>
+                                <th>Expansion (%)</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in data.results %}
+                            <tr class="{% if result.threshold == data.recommended.threshold %}table-success{% endif %}">
+                                <td><strong>{{ result.threshold }}</strong></td>
+                                <td>{{ result.objects_defined }}</td>
+                                <td>{{ result.missing_ips_included }}</td>
+                                <td>{{ "%.1f"|format(result.expansion_percent) }}%</td>
+                                <td>{{ "%.3f"|format(result.score) }}</td>
+                                <td>
+                                    {% if result in data.frontier %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-star me-1"></i>Pareto
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Suboptimal</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary generate-btn" 
+                                            data-threshold="{{ result.threshold }}"
+                                            data-objects="{{ result.objects_defined }}"
+                                            data-missing="{{ result.missing_ips_included }}">
+                                        <i class="fas fa-download me-1"></i>
+                                        Generate
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart data
+    const results = {{ data.results|tojson }};
+    const frontier = {{ data.frontier|tojson }};
+    
+    // Objects vs Missing IPs Chart
+    const ctx1 = document.getElementById('objectsVsMissingChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Pareto Frontier',
+                data: frontier.map(r => ({
+                    x: r.objects_defined,
+                    y: r.missing_ips_included
+                })),
+                backgroundColor: 'rgba(39, 174, 96, 0.8)',
+                borderColor: 'rgba(39, 174, 96, 1)',
+                pointRadius: 8,
+                pointStyle: 'star'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Objects Defined'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Missing IPs Included'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Score Distribution Chart
+    const ctx2 = document.getElementById('scoreChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: results.map(r => r.threshold + '%'),
+            datasets: [{
+                label: 'Score',
+                data: results.map(r => r.score),
+                backgroundColor: results.map(r => {
+                    if (r.threshold === {{ data.recommended.threshold }}) {
+                        return 'rgba(255, 193, 7, 0.9)'; // Golden yellow for recommended
+                    } else if (frontier.some(f => f.threshold === r.threshold)) {
+                        return 'rgba(39, 174, 96, 0.8)'; // Green for Pareto frontier
+                    } else {
+                        return 'rgba(52, 152, 219, 0.6)'; // Blue for others
+                    }
+                }),
+                borderColor: results.map(r => {
+                    if (r.threshold === {{ data.recommended.threshold }}) {
+                        return 'rgba(255, 193, 7, 1)'; // Golden yellow border
+                    } else if (frontier.some(f => f.threshold === r.threshold)) {
+                        return 'rgba(39, 174, 96, 1)'; // Green border
+                    } else {
+                        return 'rgba(52, 152, 219, 1)'; // Blue border
+                    }
+                }),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const threshold = results[context.dataIndex].threshold;
+                            const isRecommended = threshold === {{ data.recommended.threshold }};
+                            return isRecommended ? '★ ' + context.parsed.y.toFixed(3) + ' (Recommended)' : context.parsed.y.toFixed(3);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Score (Lower is Better)'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Generate button functionality
+    document.querySelectorAll('.generate-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const threshold = this.dataset.threshold;
+            const outputFormat = document.getElementById('outputFormat').value;
+            generateAndDownload(threshold, outputFormat, this);
+        });
+    });
+    
+    function generateAndDownload(threshold, outputFormat, btn) {
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generating...';
+        btn.disabled = true;
+        
+        fetch('/api/generate_output', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                threshold: parseInt(threshold),
+                output_format: outputFormat
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Automatically trigger download
+                const downloadUrl = '/download/' + data.filename;
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = data.filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Show brief success feedback
+                                     btn.innerHTML = '<i class="fas fa-check me-1"></i>Downloaded';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            } else {
+                alert('Error: ' + data.error);
+                btn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error generating configuration');
+            btn.innerHTML = originalText;
+        })
+        .finally(() => {
+            btn.disabled = false;
+        });
+    }
+});
+</script>
+{% endblock %}

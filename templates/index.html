@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}ASA IP Consolidator - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-5">
+                         <h1 class="display-4 fw-bold text-primary mb-3">
+                                 <i class="fas fa-network-wired me-3"></i>
+                IP Consolidator
+             </h1>
+            <p class="lead text-muted">
+                Optimize your network objects by consolidating individual host IPs into efficient CIDR networks
+            </p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                                 <h5 class="card-title">
+                                         <i class="fas fa-upload me-2"></i>
+                    Upload IP Configuration File
+                 </h5>
+                <p class="card-text text-muted">
+                    Upload any file containing IP addresses or CIDR networks (ASA configs, logs, CSV files, etc.) to begin consolidation analysis.
+                </p>
+                
+                <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+                                            <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                        
+                        <h5>Drag & Drop your file here</h5>
+                        <p class="text-muted">or click to browse</p>
+                        <input type="file" name="file" id="fileInput" class="d-none" accept=".txt,.cfg,.conf,.csv,.log,.dat,.lst,.ip,.hosts">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-folder-open me-2"></i>
+                            Choose File
+                        </button>
+                    </div>
+                    
+                    <div class="mt-3" id="fileInfo" style="display: none;">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span id="fileName"></span> selected
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg" id="uploadBtn" disabled>
+                            <i class="fas fa-rocket me-2"></i>
+                            Analyze Configuration
+                        </button>
+                        <div id="uploadProgress" class="mt-3" style="display: none;">
+                            <div class="progress mb-2">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%" id="progressBar">
+                                    0%
+                                </div>
+                            </div>
+                            <small class="text-muted" id="progressText">Processing file...</small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-2x text-primary mb-3"></i>
+                        <h6 class="card-title">Smart Analysis</h6>
+                        <p class="card-text small">Multi-threshold analysis to find optimal balance between object count and IP coverage</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-compress-alt fa-2x text-success mb-3"></i>
+                        <h6 class="card-title">Efficient Consolidation</h6>
+                        <p class="card-text small">Reduce hundreds of individual host objects into optimized CIDR networks</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-download fa-2x text-warning mb-3"></i>
+                        <h6 class="card-title">Ready Output</h6>
+                        <p class="card-text small">Generate network configuration files ready for deployment</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="card mt-4">
+            <div class="card-body">
+                                 <h5 class="card-title">
+                     <i class="fas fa-info-circle me-2"></i>
+                     How It Works
+                 </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Input</h6>
+                        <ul class="list-unstyled">
+                             <li><i class="fas fa-check text-success me-2"></i>Any file with IP addresses</li>
+                             <li><i class="fas fa-check text-success me-2"></i>ASA configs, logs, CSV files</li>
+                             <li><i class="fas fa-check text-success me-2"></i>Individual IPs and CIDR networks</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Output</h6>
+                        <ul class="list-unstyled">
+                             <li><i class="fas fa-arrow-right text-primary me-2"></i>Consolidated CIDR networks</li>
+                             <li><i class="fas fa-arrow-right text-primary me-2"></i>Reduced object count</li>
+                             <li><i class="fas fa-arrow-right text-primary me-2"></i>ASA-ready configuration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadForm = document.getElementById('uploadForm');
+
+    // File input change handler
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            fileName.textContent = file.name;
+            fileInfo.style.display = 'block';
+            uploadBtn.disabled = false;
+            uploadArea.style.borderColor = '#27ae60';
+            uploadArea.style.background = 'rgba(39, 174, 96, 0.1)';
+            
+            // Show file size info for large files
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            if (fileSizeMB > 1) {
+                document.getElementById('progressText').textContent = `Large file detected (${fileSizeMB} MB). Processing may take longer...`;
+            }
+        }
+    });
+
+    // Form submission with progress tracking
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(uploadForm);
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            alert('Please select a file first.');
+            return;
+        }
+        
+        // Show progress indicator
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        document.getElementById('uploadProgress').style.display = 'block';
+        
+        // Simulate progress for large files
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressBar').textContent = Math.round(progress) + '%';
+            
+            if (progress < 30) {
+                document.getElementById('progressText').textContent = 'Extracting IP addresses...';
+            } else if (progress < 60) {
+                document.getElementById('progressText').textContent = 'Running consolidation analysis...';
+            } else if (progress < 90) {
+                document.getElementById('progressText').textContent = 'Generating results...';
+            }
+        }, 200);
+        
+        // Submit form
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            clearInterval(progressInterval);
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('progressBar').textContent = '100%';
+            document.getElementById('progressText').textContent = 'Complete! Redirecting...';
+            
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                return response.text();
+            }
+        })
+        .catch(error => {
+            clearInterval(progressInterval);
+            console.error('Error:', error);
+            alert('Upload failed. Please try again.');
+            
+            // Reset UI
+            uploadBtn.disabled = false;
+                         uploadBtn.innerHTML = '<i class="fas fa-rocket me-2"></i>Analyze Configuration';
+            document.getElementById('uploadProgress').style.display = 'none';
+        });
+    });
+
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#3498db';
+        uploadArea.style.background = 'rgba(52, 152, 219, 0.1)';
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#3498db';
+        uploadArea.style.background = 'rgba(52, 152, 219, 0.05)';
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            const file = files[0];
+            fileName.textContent = file.name;
+            fileInfo.style.display = 'block';
+            uploadBtn.disabled = false;
+            uploadArea.style.borderColor = '#27ae60';
+            uploadArea.style.background = 'rgba(39, 174, 96, 0.1)';
+        }
+    });
+
+    // Form submission
+    uploadForm.addEventListener('submit', function() {
+        uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        uploadBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}
