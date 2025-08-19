@@ -10,7 +10,7 @@ import json
 import hashlib
 import time
 import threading
-from werkzeug.utils import secure_filename
+
 from dotenv import load_dotenv
 from core_consolidation import extract_host_ips
 from analysis import run_consolidation_analysis
@@ -37,41 +37,7 @@ def get_secret_key():
 
 app.secret_key = get_secret_key()
 
-def delayed_file_cleanup(file_path, delay_seconds=300):
-    """Clean up file after a configurable delay with retry mechanism"""
-    def cleanup():
-        # Wait for initial delay
-        time.sleep(delay_seconds)
-        
-        # Try to clean up the file, with retries every 30 seconds
-        retry_interval = 30  # seconds
-        max_retries = 20  # Maximum 10 minutes of retries (20 * 30 seconds)
-        retry_count = 0
-        
-        while retry_count < max_retries:
-            try:
-                if os.path.exists(file_path):
-                    os.unlink(file_path)
-                    print(f"Cleaned up file after {delay_seconds + (retry_count * retry_interval)} seconds: {os.path.basename(file_path)}")
-                    return  # Successfully cleaned up, exit the loop
-                else:
-                    print(f"File no longer exists: {os.path.basename(file_path)}")
-                    return  # File already gone, exit the loop
-            except PermissionError:
-                # File might be in use (being downloaded), retry
-                retry_count += 1
-                if retry_count < max_retries:
-                    print(f"File in use, retrying cleanup in {retry_interval} seconds: {os.path.basename(file_path)} (attempt {retry_count}/{max_retries})")
-                    time.sleep(retry_interval)
-                else:
-                    print(f"Failed to clean up file after {max_retries} retries: {os.path.basename(file_path)}")
-            except Exception as e:
-                print(f"Error cleaning up file {os.path.basename(file_path)}: {e}")
-                return  # Exit on other errors
-    
-    # Start cleanup thread
-    cleanup_thread = threading.Thread(target=cleanup, daemon=True)
-    cleanup_thread.start()
+
 
 def immediate_file_cleanup(file_path):
     """Clean up file after 30 second delay with retry mechanism every 30 seconds"""
