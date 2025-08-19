@@ -447,12 +447,6 @@ The application includes an intelligent delayed file cleanup system with retry m
 - **Timeout**: Stops retrying after 10 attempts (5 minutes total)
 - **Error Handling**: Distinguishes between "file in use" and other errors
 
-### ⚙️ **Configuration**
-```bash
-# Note: The CLEANUP_DELAY_SECONDS setting is no longer used
-# Files are now cleaned up immediately with 30-second retries
-```
-
 ### 🚀 Production Deployment
 
 For production deployment, ensure you:
